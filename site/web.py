@@ -67,7 +67,10 @@ def run(scenario_json, cards_json):
             if v.action != ALLOW:
                 token, note = respond(token, v, ev)
                 tokens[agent] = token
+        # what a plain token check (IAM) would have said; calls with no scope of their own (ask_agent) pass it
+        iam = scope in granted.get(agent, []) or ":" not in scope
         rows.append({**row, "score": v.score, "action": action, "note": note, "token": list(token),
+                     "scope": scope, "iam": iam,
                      "reasons": [[p, t] for p, t in v.reasons],
                      "evidence": [{"source": os.path.basename(e["source"]), "page": e["page"],
                                    "hidden": e["hidden"], "text": e["text"]} for e in v.evidence]})

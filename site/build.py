@@ -167,6 +167,7 @@ def playground():
     cards = {os.path.basename(p): open(p, encoding="utf-8").read()
              for p in sorted(glob.glob(os.path.join(ROOT, "rolecards", "*.yaml")))}
     return {"pyodide": PYODIDE, "wheel": "py/" + wheel, "files": files, "samples": list(SAMPLES),
+            "poisoned": [n for n, spec in SAMPLES.items() if spec[4]],
             "cards": cards, "tokens": TOKENS, "presets": PRESETS}
 
 
