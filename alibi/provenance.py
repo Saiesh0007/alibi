@@ -7,10 +7,14 @@ Two ideas:
    should be traceable to the task, the role card or ordinary data. If it only exists inside a
    hidden command, the action has no alibi.
 """
+import math
 import os
 import re
 
-import pymupdf
+try:
+    import pymupdf
+except ImportError:  # in the browser (Pyodide) there is no PyMuPDF; read_pdf falls back to pypdf
+    pymupdf = None
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -40,6 +44,8 @@ def instruction_score(sentence, hidden=False):
 
 def read_pdf(path):
     """Text of a PDF plus the spans a human can't see (white or tiny text)."""
+    if pymupdf is None or os.environ.get("ALIBI_PDF") == "pypdf":
+        return _read_pdf_pypdf(path)
     visible, hidden = [], []
     with pymupdf.open(path) as doc:
         for pno, page in enumerate(doc, 1):
@@ -51,6 +57,40 @@ def read_pdf(path):
                             continue
                         is_hidden = span["size"] < 3 or span["color"] in (0xFFFFFF, 0xFEFEFE)
                         (hidden if is_hidden else visible).append((pno, txt))
+    return visible, hidden
+
+
+def _read_pdf_pypdf(path):
+    """Same as read_pdf, with pure-Python pypdf: tracks the fill colour and text size of every string drawn."""
+    from pypdf import PdfReader
+
+    visible, hidden = [], []
+    for pno, page in enumerate(PdfReader(path).pages, 1):
+        fill, saved = (0.0, 0.0, 0.0), []
+
+        def before(op, args, cm, tm):
+            nonlocal fill
+            if op == b"q":
+                saved.append(fill)
+            elif op == b"Q" and saved:
+                fill = saved.pop()
+            elif op == b"rg" and len(args) == 3:
+                fill = tuple(float(a) for a in args)
+            elif op == b"g" and len(args) == 1:
+                fill = (float(args[0]),) * 3
+            elif op == b"k" and len(args) == 4:
+                c, m, y, k = (float(a) for a in args)
+                fill = ((1 - c) * (1 - k), (1 - m) * (1 - k), (1 - y) * (1 - k))
+
+        def text(txt, cm, tm, font, size):
+            txt = txt.strip()
+            if not txt:
+                return
+            size = size * math.hypot(tm[0], tm[1]) * math.hypot(cm[0], cm[1])
+            is_hidden = size < 3 or min(fill) >= 0.99
+            (hidden if is_hidden else visible).append((pno, txt))
+
+        page.extract_text(visitor_operand_before=before, visitor_text=text)
     return visible, hidden
 
 

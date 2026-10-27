@@ -7,8 +7,6 @@ Each scenario is a list of steps:
 import os
 import random
 
-import pymupdf
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "data")
 os.makedirs(DATA, exist_ok=True)
@@ -25,6 +23,8 @@ def slug(s):
 
 
 def quote_pdf(name, supplier, item, qty, price, hidden=None, note=None):
+    import pymupdf  # only needed to write PDFs, so the browser build can import this module without it
+
     path = os.path.join(DATA, name)
     doc = pymupdf.open()
     page = doc.new_page()  # A4

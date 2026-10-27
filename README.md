@@ -2,8 +2,9 @@
 
 Every action an AI agent takes has to trace back to a job a human gave it.
 
-**Live page:** https://saiesh0007.github.io/alibi/ (rebuilt by GitHub Actions on every push to `main`,
-from a fresh run of the three scripts below)
+**Live prototype:** https://saiesh0007.github.io/alibi/ runs this engine in your browser (Pyodide). Load an attack,
+edit the steps, role card or token, upload your own PDF, and see each tool call scored. The page is rebuilt by
+GitHub Actions on every push to `main`, from a fresh run of the three scripts below.
 
 ALIBI sits in front of an agent's tools and scores each tool call (0 to 100) with three checks:
 
@@ -44,5 +45,7 @@ alibi/respond.py     verdict -> smaller token
 alibi/drift.py       daily action mix, Jensen-Shannon distance, CUSUM
 rolecards/changes/   signed role-card updates
 site/build.py        builds the GitHub Pages site from out/
+site/web.py          the playground's bridge to the engine (runs in the browser)
+site/presets.py      playground scenarios and sample PDFs
 scenarios.py         normal work and attacks
 ```
