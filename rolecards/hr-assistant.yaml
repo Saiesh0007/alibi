@@ -1,0 +1,15 @@
+agent: hr-assistant-04
+owner: hr-team
+purpose: Answer employee questions about leave, holidays and HR policies.
+version: 1
+
+tools: [read_file, send_email]
+
+data:
+  allow: ["hr/policies/*", "hr/holidays/*"]
+
+egress:
+  allow: ["mail.acme.com"]
+
+limits:
+  reads_per_session: 20

@@ -1,0 +1,15 @@
+agent: procurement-agent-07
+owner: procurement-team
+purpose: Compare supplier quotes and raise purchase requests for approved items.
+version: 1
+
+tools: [search_suppliers, read_file, create_purchase_request, send_email, ask_agent]
+
+data:
+  allow: ["suppliers/*", "quotes/*", "catalog/*"]
+
+egress:
+  allow: ["erp.acme.internal", "mail.acme.com"]
+
+limits:
+  reads_per_session: 25

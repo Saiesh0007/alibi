@@ -1,0 +1,21 @@
+agent: procurement-agent-07
+owner: procurement-team
+purpose: Compare supplier quotes, raise purchase requests and track shipments for approved orders.
+version: 2
+
+# A role change only counts when the owner signs it off. Unsigned versions are ignored.
+change:
+  ticket: CHG-1042
+  approved_by: procurement-team
+  reason: Agent now also tracks delivery of the orders it raises.
+
+tools: [search_suppliers, read_file, create_purchase_request, send_email, ask_agent, track_shipment]
+
+data:
+  allow: ["suppliers/*", "quotes/*", "catalog/*", "logistics/*"]
+
+egress:
+  allow: ["erp.acme.internal", "mail.acme.com", "api.bluedart.example"]
+
+limits:
+  reads_per_session: 25

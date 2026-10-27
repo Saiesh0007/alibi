@@ -1,0 +1,15 @@
+agent: support-agent-11
+owner: customer-support
+purpose: Read customer tickets and reply to customers with order status and fixes.
+version: 1
+
+tools: [read_ticket, read_file, send_email]
+
+data:
+  allow: ["tickets/*", "kb/*", "orders/*"]
+
+egress:
+  allow: ["mail.acme.com", "*.customer"]
+
+limits:
+  reads_per_session: 30

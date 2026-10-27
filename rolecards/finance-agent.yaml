@@ -1,0 +1,15 @@
+agent: finance-agent-02
+owner: finance-team
+purpose: Reconcile invoices and prepare payroll and payment reports for the finance team.
+version: 1
+
+tools: [read_file, export_report, send_email]
+
+data:
+  allow: ["finance/*", "hr/payroll/*", "invoices/*"]
+
+egress:
+  allow: ["mail.acme.com"]
+
+limits:
+  reads_per_session: 40
